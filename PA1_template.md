@@ -1,11 +1,6 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-author: "Gayatri Kanthimathi Sukumar"
-date: "Monday, January 12, 2015"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
+Gayatri Kanthimathi Sukumar  
+Monday, January 12, 2015  
 
 ##Introduction: 
 This is my solution to the Peer Assignment 1 of the Coursera Reproducible 
@@ -21,9 +16,7 @@ The variables included in this dataset are:
 * interval: Identifier for the 5-minute interval in which measurement was taken
 
 ##Assignment Questions with Solutions:
-```{r echo=FALSE}
-setwd("C:/Users/KanthimathiGayatri/Desktop/RepData_PeerAssessment1")
-```
+
 
 ###Loading and preprocessing the data
 ####Question
@@ -39,18 +32,34 @@ Show any code that is needed to
 The below code loads the activity.csv file as activityDF data frame. We will also
 inspect the variables in this data and their types.
 
-```{r LoadData}
+
+```r
 activityDF = read.csv("./activity/activity.csv", sep = ",")
 str(activityDF)
+```
+
+```
+## 'data.frame':	17568 obs. of  3 variables:
+##  $ steps   : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ date    : Factor w/ 61 levels "2012-10-01","2012-10-02",..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ interval: int  0 5 10 15 20 25 30 35 40 45 ...
 ```
 
 2. Process/transform the data (if necessary) into a format suitable for your analysis
 
 From the above result, we observe that the date variable is stored as a factor variable. Let us convert date from factor to R date type and view the variable types again.
 
-```{r ProcessData}
+
+```r
 activityDF$date = as.Date (activityDF$date, format = "%Y-%m-%d")
 str(activityDF)
+```
+
+```
+## 'data.frame':	17568 obs. of  3 variables:
+##  $ steps   : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ date    : Date, format: "2012-10-01" "2012-10-01" ...
+##  $ interval: int  0 5 10 15 20 25 30 35 40 45 ...
 ```
 
 ###What is mean total number of steps taken per day?
@@ -67,23 +76,38 @@ For this part of the assignment, you can ignore the missing values in the datase
 Let us make a histogram of the total number of steps taken each day with the
 below R code.
 
-```{r HistogramTotalStepsPerDay}
+
+```r
 dayWiseTotalSteps = tapply (activityDF$steps, as.factor (activityDF$date), sum)
 hist (dayWiseTotalSteps, main = "Frequency of Total Number of Steps Taken Each Day", xlab = "Total Number of Steps Each Day", ylab = "Frequency", col = "navy blue", breaks = 10)
 ```
+
+![](./PA1_template_files/figure-html/HistogramTotalStepsPerDay-1.png) 
 
 2. Calculate and report the mean and median total number of steps taken per day
 
 Let us calculate the mean and median of the total number of steps taken per day.
 
-```{r MeanAndMedian}
+
+```r
 meanStepsPerDay = mean (dayWiseTotalSteps, na.rm = TRUE)
 medianStepsPerDay = median (dayWiseTotalSteps, na.rm = TRUE)
 meanStepsPerDay
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 medianStepsPerDay
 ```
 
-As per the above, the mean and median of the total number of steps taken per day are `r meanStepsPerDay` and `r medianStepsPerDay` respectively.
+```
+## [1] 10765
+```
+
+As per the above, the mean and median of the total number of steps taken per day are 1.0766189\times 10^{4} and 10765 respectively.
 
 ###What is the average daily activity pattern?
 ####Question
@@ -96,19 +120,23 @@ As per the above, the mean and median of the total number of steps taken per day
 
 1. Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
 
-```{r AverageStepsIntervalWise}
+
+```r
 avgStepsIntervalWise = tapply (activityDF$steps, as.factor (activityDF$interval), mean, na.rm = TRUE)
 plot (as.numeric (row.names (avgStepsIntervalWise)), avgStepsIntervalWise, type = 'l', xlab = "Daily 5-minute interval", ylab = "Average Number of Steps", main = "Average number of steps taken, averaged across all days")
 ```
 
+![](./PA1_template_files/figure-html/AverageStepsIntervalWise-1.png) 
+
 2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
-```{r HighestStepsInterval}
+
+```r
 intervalWithHighestSteps = names (which.max (avgStepsIntervalWise))
 View(intervalWithHighestSteps)
 ```
 
-From the above calculation, the interval with the highest average steps is `r intervalWithHighestSteps`.
+From the above calculation, the interval with the highest average steps is 835.
 
 ###Imputing missing values
 ####Question
@@ -126,12 +154,13 @@ Note that there are a number of days/intervals where there are missing values (c
 
 1. Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)
 
-```{r RowsWithNAs}
+
+```r
 totalRowsWithNAs = sum(is.na(activityDF))
 View(totalRowsWithNAs)
 ```
 
-From the above calculation, the total number of rows with NA are `r totalRowsWithNAs`.
+From the above calculation, the total number of rows with NA are 2304.
 
 2. Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
 
@@ -141,7 +170,8 @@ Strategy: Here we are going to impute the missing values with the average across
 
 The new dataset created below 'imputedActivityDF' has the missing values imputed as per the above strategy. 
 
-```{r ImputeIntervalMean}
+
+```r
 imputedActivityDF = activityDF
 
 for (i in 1:nrow (imputedActivityDF)) 
@@ -154,7 +184,21 @@ for (i in 1:nrow (imputedActivityDF))
 }
 
 str (imputedActivityDF)
+```
+
+```
+## 'data.frame':	17568 obs. of  3 variables:
+##  $ steps   : num  2 0 0 0 0 2 1 1 0 1 ...
+##  $ date    : Date, format: "2012-10-01" "2012-10-01" ...
+##  $ interval: int  0 5 10 15 20 25 30 35 40 45 ...
+```
+
+```r
 sum(is.na(imputedActivityDF))
+```
+
+```
+## [1] 0
 ```
 
 We can also observe that in the new dataset, there are no missing values.
@@ -163,18 +207,33 @@ We can also observe that in the new dataset, there are no missing values.
 
 Let us redo the histogram, mean and median with the new imputed dataset.
 
-```{r ImputedHistogramTotalStepsPerDay}
+
+```r
 imputedDayWiseTotalSteps = tapply (imputedActivityDF$steps, as.factor (imputedActivityDF$date), sum)
 hist (imputedDayWiseTotalSteps, main = "Frequency of Total Number of Steps Taken Each Day (Imputes Dataset", xlab = "Total Number of Steps Each Day", ylab = "Frequency", col = "blue", breaks = 10)
 ```
 
+![](./PA1_template_files/figure-html/ImputedHistogramTotalStepsPerDay-1.png) 
+
 Let us calculate the mean and median of the total number of steps taken per day on the imputed dataset.
 
-```{r ImputedMeanAndMedian}
+
+```r
 imputedMeanStepsPerDay = mean (imputedDayWiseTotalSteps, na.rm = TRUE)
 imputedMedianStepsPerDay = median (imputedDayWiseTotalSteps, na.rm = TRUE)
 imputedMeanStepsPerDay
+```
+
+```
+## [1] 10765.64
+```
+
+```r
 imputedMedianStepsPerDay
+```
+
+```
+## [1] 10762
 ```
 
 From the above, there appears to be **no impact or extremely negligible impact** on the estimates of the total daily number of steps on imputing the missing values with interval mean.
@@ -193,22 +252,50 @@ For this part the weekdays() function may be of some help here. Use the dataset 
 
 The way that we are doing this is to use the date and find if wday is 6 or 7. wday being 6 implies Saturday and 7 implies Sunday. The new factor variable is 'dayType'.
 
-```{r NewFactorForWeekend}
+
+```r
 imputedActivityDF$dayType = ifelse(((as.POSIXlt(imputedActivityDF$date)$wday == 6) | (as.POSIXlt(imputedActivityDF$date)$wday == 7)), "weekend", "weekday")
 imputedActivityDF$dayType = as.factor(imputedActivityDF$dayType)
 str(imputedActivityDF)
+```
+
+```
+## 'data.frame':	17568 obs. of  4 variables:
+##  $ steps   : num  2 0 0 0 0 2 1 1 0 1 ...
+##  $ date    : Date, format: "2012-10-01" "2012-10-01" ...
+##  $ interval: int  0 5 10 15 20 25 30 35 40 45 ...
+##  $ dayType : Factor w/ 2 levels "weekday","weekend": 1 1 1 1 1 1 1 1 1 1 ...
 ```
 
 From the above we observe that the new factor variable is created as required.
 
 2. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.
 
-```{r PanelPlotStepsWeekend}
+
+```r
 avgSteps = aggregate (steps ~ interval + dayType, data = imputedActivityDF, mean)
 str (avgSteps)
+```
 
+```
+## 'data.frame':	576 obs. of  3 variables:
+##  $ interval: int  0 5 10 15 20 25 30 35 40 45 ...
+##  $ dayType : Factor w/ 2 levels "weekday","weekend": 1 1 1 1 1 1 1 1 1 1 ...
+##  $ steps   : num  1.9811 0.3396 0.1321 0.1509 0.0755 ...
+```
+
+```r
 library(ggplot2)
+```
+
+```
+## Warning: package 'ggplot2' was built under R version 3.1.2
+```
+
+```r
 qplot (interval, steps, data = avgSteps, facets = dayType~. , geom = "line")
 ```
+
+![](./PA1_template_files/figure-html/PanelPlotStepsWeekend-1.png) 
 
 From the above plot, it is very clear that **there certainly are differences in activity patterns between weekdays and weekends**, with the activity being higher during weekends.
